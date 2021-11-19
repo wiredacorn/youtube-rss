@@ -1,0 +1,146 @@
+<html>
+<head>
+    <title>YouTube RSS Feed</title>
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+<h1>YouTube RSS Feed</h1>
+
+<div
+    x-data="{'showplayer': false}"
+    >
+    <!-- This example requires Tailwind CSS v2.0+ -->
+    <div x-show="showplayer" >
+        <main>
+            <div class="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <!--
+                    Background overlay, show/hide based on modal state.
+
+                    Entering: "ease-out duration-300"
+                        From: "opacity-0"
+                        To: "opacity-100"
+                    Leaving: "ease-in duration-200"
+                        From: "opacity-100"
+                        To: "opacity-0"
+                    -->
+                    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+                    <!-- This element is to trick the browser into centering the modal contents. -->
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+                    <!--
+                    Modal panel, show/hide based on modal state.
+
+                    Entering: "ease-out duration-300"
+                        From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                        To: "opacity-100 translate-y-0 sm:scale-100"
+                    Leaving: "ease-in duration-200"
+                        From: "opacity-100 translate-y-0 sm:scale-100"
+                        To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    -->
+                    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                        <div @click.outside="pause();showplayer = false" class="bg-black px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                            <div class="sm:flex sm:items-start">
+                                <div id="player"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+
+
+
+
+    <div>
+
+    
+
+        <ul class="flex flex-row flex-wrap m-4 w-full">
+            {% for episode in  feed['11tydata'].items %}
+                <li class="mr-1 mb-1">
+                    <a 
+                        @click="showplayer = true;loadVideo($el.dataset.href)"
+                        data-href="{{episode.link}}">
+                        <div 
+                            class="w-60 h-36"
+                            style="
+                                background-image:url('{{ episode['media:group']['media:thumbnail'][0]['$'].url }}');
+                                background-repeat:no-repeat;
+                                background-size:cover;
+                            ">
+                            <div class="text-white">  
+                                <p>{{ episode.title }}</p>                      
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<script>
+    function pause() {
+        player.pauseVideo()
+    }
+    function loadVideo(link) {
+        const id = link.split("=").pop();
+
+        console.log(link);
+        console.log(id);
+
+        player.loadVideoById(id, 5, "large")
+    }
+      // 2. This code loads the IFrame Player API code asynchronously.
+      var tag = document.createElement('script');
+
+      tag.src = "https://www.youtube.com/iframe_api";
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+      // 3. This function creates an <iframe> (and YouTube player)
+      //    after the API code downloads.
+      var player;
+      function onYouTubeIframeAPIReady() {
+        player = new YT.Player('player', {
+          height: '390',
+          width: '640',
+          videoId: 'IYGgbMEjLzk',
+          playerVars: {
+            'playsinline': 1
+          },
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      }
+
+      // 4. The API will call this function when the video player is ready.
+      function onPlayerReady(event) {
+        event.target.playVideo();
+      }
+
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+      var done = false;
+      function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING && !done) {
+          setTimeout(stopVideo, 6000);
+          done = true;
+        }
+      }
+      function stopVideo() {
+        player.stopVideo();
+      }
+    </script>
+
+</body>
+</html>
