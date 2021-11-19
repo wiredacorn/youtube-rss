@@ -68,8 +68,10 @@
                         @click="showplayer = true;loadVideo($el.dataset.href)"
                         data-href="{{episode.link}}">
                         <div 
-                            class="w-60 h-36"
+                            class=""
                             style="
+                                width:350px;
+                                aspect-ratio: 480 / 360;
                                 background-image:url('{{ episode['media:group']['media:thumbnail'][0]['$'].url }}');
                                 background-repeat:no-repeat;
                                 background-size:cover;
